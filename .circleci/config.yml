@@ -1,19 +1,11 @@
-version: 2.1
+version: 2
 
 defaults: &defaults
   working_directory: ~/code
   docker:
-    - image: circleci/android:api-29
+    - image: circleci/android:api-26-alpha
   environment:
-    JVM_OPTS: -Xmx3g
-  resource_class: large
-
-general_cache_key: &general_cache_key
-  key: jars-{{ .Environment.CIRCLE_CACHE_VER }}-{{ checksum "build.gradle.kts" }}-{{ checksum  "app/build.gradle.kts" }}
-
-attach_workspace: &attach_workspace
-  attach_workspace:
-    at: ~/code
+    JVM_OPTS: -Xmx3200m
 
 jobs:
   build:
@@ -21,91 +13,86 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          <<: *general_cache_key
-      - run: yes | sdkmanager --licenses || exit 0
-      - run: yes | sdkmanager --update || exit 0
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
-          name: Copy gradle.properties for CI
-          command: mkdir -p ~/.gradle ; cp .circleci/ci-gradle.properties ~/.gradle/gradle.properties
-      - run:
-          name: Run Tests
-          command: ./gradlew jacocoReport
-      - run:
-          name: Upload Code Coverage
-          command: bash <(curl -s https://codecov.io/bash) -t a3a5e628-25f2-4588-8a59-a16647ede519 -f build/reports/jacoco/jacocoReport/jacocoReport.xml
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
       - save_cache:
           paths:
             - ~/.gradle
-          <<: *general_cache_key
-      - store_test_results:
-          path: core/build/test-results
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Check lint
+          command: ./gradlew :app:check -x test
+      - run:
+          name: Build apk
+          command: ./gradlew :app:assembleDebug
       - store_artifacts:
-          path: app/build/outputs
-          destination: outputs
+          path: app/build/outputs/apk/app-debug.apk
+          destination: app-debug.apk
+      - store_test_results:
+          path: app/build/test-results
       - persist_to_workspace:
           root: ~/code
           paths:
             - .
 
-  deploy_to_google_play:
+  check:
+    working_directory: ~/code
+    docker:
+      - image: circleci/ruby:2.4.1
+    steps:
+      - attach_workspace:
+          at: ~/code
+      - restore_cache:
+          key: gems-{{ checksum "Gemfile.lock" }}
+      - run: bundle install --path vendor/bundle
+      - run:
+          name: Run danger
+          command: bundle exec danger
+      - run:
+          name: Move artifacts
+          command: |
+            ARTIFACTS="/tmp/circle_artifacts"
+            mkdir -p "$ARTIFACTS"
+            cp -v "app/build/reports/checkstyle/checkstyle.xml" "$ARTIFACTS/"
+            cp -v "app/build/reports/findbugs/findbugs.xml" "$ARTIFACTS/"
+            cp -v "app/build/reports/pmd/pmd.xml" "$ARTIFACTS/"
+            cp -v "app/build/reports/pmd/cpd.xml" "$ARTIFACTS/"
+            cp -v "app/build/reports/lint-results.xml" "$ARTIFACTS/"
+      - save_cache:
+          paths:
+            - vendor/bundle
+          key: gems-{{ checksum "Gemfile.lock" }}
+      - store_artifacts:
+          path: "/tmp/circle_artifacts"
+
+  deploy:
     <<: *defaults
     steps:
-      - *attach_workspace
-      - restore_cache:
-          <<: *general_cache_key
+      - attach_workspace:
+          at: ~/code
       - run:
-          name: Deploy to Google Play
-          command: |
-            if [[ "${CIRCLE_TAG}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              echo "Deploy to Google Play"
-              ./gradlew clean bundleRelease publishReleaseBundle
-            fi
-
-  deploy_to_deploygate:
-    <<: *defaults
-    steps:
-      - *attach_workspace
-      - restore_cache:
-          <<: *general_cache_key
-      - run:
-          name: Deploy to Deploygate
-          command: |
-            if [[ "${CIRCLE_BRANCH}" =~ ^release.*$ ]]; then
-              echo "Deploy to DeployGate"
-              ./gradlew clean uploadDeployGateDebug uploadDeployGateQa uploadDeployGateBeta
-            fi
-
+          name: Build apk
+          command: ./gradlew :app:assembleRelease
+      - store_artifacts:
+          path: app/build/outputs/apk/app-release.apk
+          destination: app-release.apk
+      - store_artifacts:
+          path: app/build/outputs/mapping/release/dump.txt
+          destination: dump.txt
 workflows:
-  version: 2.1
-
-  build_and_deploy_to_deploygate:
+  version: 2
+  build_and_deploy:
     jobs:
-      - build:
-          filters:
-            branches:
-              only: /.*/
-            tags:
-              ignore: /.*/
-      - deploy_to_deploygate:
+      - build
+      - check:
           requires:
             - build
-          filters:
-            branches:
-              only: /^release.*$/
-
-  deploy_and_deploy_to_google_play:
-    jobs:
-      - build:
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
-      - deploy_to_google_play:
+      - deploy:
           requires:
             - build
+            - check
           filters:
-            tags:
-              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
             branches:
-              ignore: /.*/
+              only: main
