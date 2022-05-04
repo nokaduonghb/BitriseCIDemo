@@ -1,0 +1,5 @@
+# IDE には読み込ませないが、ktlintCheck / ktlintFormat には読み込ませる .editorconfig
+[{*.kt, *.kts}]
+# Exceeded max line length は自動で format できないことが多いので無効
+max_line_length = off
+disabled_rules = import-ordering, no-wildcard-imports, parameter-list-wrapping
