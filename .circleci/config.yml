@@ -8,7 +8,7 @@ defaults: &defaults
     JVM_OPTS: -Xmx3200m
 
 jobs:
-  build:
+  apply_ktlint:
     <<: *defaults
     steps:
       - checkout
@@ -16,40 +16,24 @@ jobs:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
           name: Download Dependencies
-          command: sudo chmod +x ./gradlew
+          command: ./gradlew androidDependencies
       - save_cache:
           paths:
             - ~/.gradle
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
-          name: Build apk
-          command: ./gradlew :app:assembleDebug
-      - store_artifacts:
-          path: app/build/outputs/apk/app-debug.apk
-          destination: app-debug.apk
-      - store_test_results:
-          path: app/build/test-results
-      - persist_to_workspace:
-          root: ~/code
-          paths:
-            - .
-
-  apply-ktlint:
-    working_directory: ~/code
-    docker:
-      - image: circleci/ruby:2.4.1
-    steps:
-      - attach_workspace:
-          at: ~/code
-      - run:
           name: Apply ktlint format
-          command: ./gradlew ktlintCheck
-
+          command: ./gradlew ktlintFormat
+            - run:
+                name: Commit changes
+                shell: bash +e {0}
+                command: |
+                  git config --local user.email "noka-bot@noka.co"
+                  git config --local user.name "noka-bot"
+                  git commit -am "Apply ktlint Format" && git push origin HEAD
+                  exit 0
 workflows:
   version: 2
-  build_and_apply-ktlint:
+  build_and_deploy:
     jobs:
-      - build
-      - apply-ktlint:
-          requires:
-            - build
+      - apply_ktlint
