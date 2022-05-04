@@ -43,18 +43,11 @@ jobs:
           at: ~/code
       - run:
           name: Apply ktlint format
-          command: ./gradlew ktlintFormat
-      - run:
-          name: Commit changes
-          shell: bash +e {0}
-          command: |
-            git config --local user.email "noka-bot@noka.co"
-            git config --local user.name "noka-bot"
-            git commit -am "Apply ktlint Format" && git push origin HEAD
-            exit 0
+          command: ./gradlew ktlintCheck
+
 workflows:
   version: 2
-  build_and_deploy:
+  build_and_apply-ktlint:
     jobs:
       - build
       - apply-ktlint:
