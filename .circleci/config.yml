@@ -26,6 +26,8 @@ jobs:
           command: ./gradlew ktlintFormat
       - run:
           name: Commit changes
+          env:
+            DANGER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           command: |
             git config --local user.email "noka-bot@noka.co"
             git config --local user.name "noka-bot"
