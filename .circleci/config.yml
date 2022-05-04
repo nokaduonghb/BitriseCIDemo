@@ -27,8 +27,6 @@ jobs:
       - run:
           name: Commit changes
           command: |
-            git config --local user.email "noka-bot@noka.co"
-            git config --local user.name "noka-bot"
             git commit -am "Apply ktlint Format" && git push origin HEAD
             exit 0
 
