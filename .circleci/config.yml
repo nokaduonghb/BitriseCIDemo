@@ -25,6 +25,9 @@ jobs:
           name: Check lint
           command: ./gradlew :app:check -x test
       - run:
+          name: Ktlint
+          command: ./gradlew ktlintCheck
+      - run:
           name: Build apk
           command: ./gradlew :app:assembleDebug
       - store_artifacts:
