@@ -1,56 +1,87 @@
-# PR がレビュー可能になったら Ktlint を適用する
-name: Ktlint Check & Apply Ktlint format & Commit changes
+version: 2
 
-on:
-  pull_request:
-    types: [ opened, reopened, synchronize, ready_for_review ]
+defaults: &defaults
+  working_directory: ~/code
+  docker:
+    - image: circleci/android:api-29
+  environment:
+    JVM_OPTS: -Xmx3200m
 
 jobs:
-  ktlint-danger-apply:
-    runs-on: ubuntu-latest
-    if: ${{ !github.event.pull_request.draft }}
+  build:
+    <<: *defaults
     steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - uses: actions/cache@v1
-        with:
-          path: vendor/bundle
-          key: bundle-ruby-${{ runner.os }}-${{ hashFiles('.ruby-version') }}-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: bundle-ruby-${{ runner.os }}-${{ hashFiles('.ruby-version') }}-
-      - name: install gem
-        run: |
-          bundle config path vendor/bundle
-          bundle install
-      - uses: actions/cache@v1
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-cache-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-gradle-cache-
-      - uses: actions/cache@v1
-        with:
-          path: .gradle
-          key: ${{ runner.os }}-gradle-project-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-gradle-project-
-      - uses: actions/cache@v1
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: ktlint
-        run: ./gradlew ktlintCheck
-      - name: Danger
-        env:
-          DANGER_GITHUB_API_TOKEN:  ${{ secrets.GITHUB_TOKEN }}
-        run: bundle exec danger
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-      - name: Apply ktlint format
-        run: ./gradlew ktlintFormat
-      - name: Commit changes
-        shell: bash +e {0}
-        run: |
-          git config --local user.email "duonghb@noka.co"
-          git config --local user.name "duonghb-bot"
-          git commit -am "Apply ktlint Format" && git push origin HEAD
-          exit 0
+      - checkout
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: sudo chmod +x ./gradlew
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Check lint
+          command: ./gradlew :app:check -x test
+      - run:
+          name: Build apk
+          command: ./gradlew :app:assembleDebug
+      - store_artifacts:
+          path: app/build/outputs/apk/app-debug.apk
+          destination: app-debug.apk
+      - store_test_results:
+          path: app/build/test-results
+      - persist_to_workspace:
+          root: ~/code
+          paths:
+            - .
 
+  apply-ktlint:
+    working_directory: ~/code
+    docker:
+      - image: circleci/ruby:2.4.1
+    steps:
+      - attach_workspace:
+          at: ~/code
+      - run:
+          name: Apply ktlint format
+          command: ./gradlew ktlintFormat
+      - run:
+          name: Commit changes
+          shell: bash +e {0}
+          command: |
+            git config --local user.email "noka-bot@noka.co"
+            git config --local user.name "noka-bot"
+            git commit -am "Apply ktlint Format" && git push origin HEAD
+            exit 0
+
+  deploy:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/code
+      - run:
+          name: Build apk
+          command: ./gradlew :app:assembleRelease
+      - store_artifacts:
+          path: app/build/outputs/apk/app-release.apk
+          destination: app-release.apk
+      - store_artifacts:
+          path: app/build/outputs/mapping/release/dump.txt
+          destination: dump.txt
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build
+      - apply-ktlint:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - build
+            - check
+          filters:
+            branches:
+              only: main
