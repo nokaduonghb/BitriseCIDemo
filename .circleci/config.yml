@@ -22,11 +22,8 @@ jobs:
             - ~/.gradle
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
-          name: Check lint
-          command: ./gradlew :app:check -x test
-      - run:
-          name: Ktlint
-          command: ./gradlew ktlintCheck
+          name: Format ttlint
+          command: ./gradlew ktlintFormat
       - run:
           name: Build apk
           command: ./gradlew :app:assembleDebug
