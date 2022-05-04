@@ -47,9 +47,9 @@ jobs:
       - restore_cache:
           key: gems-{{ checksum "Gemfile.lock" }}
       - run: bundle install --path vendor/bundle
-      - run: '[ ! -z $DANGER_GITHUB_API_TOKEN ] && bundle exec danger || echo "Skipping Danger for External Contributor"'
       - run:
           name: Run danger
+          DANGER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           command: bundle exec danger
       - run:
           name: Move artifacts
