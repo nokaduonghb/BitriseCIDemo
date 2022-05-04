@@ -81,7 +81,7 @@ workflows:
       - deploy:
           requires:
             - build
-            - check
+            - apply-ktlint
           filters:
             branches:
               only: main
