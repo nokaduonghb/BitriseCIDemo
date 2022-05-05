@@ -28,6 +28,7 @@ jobs:
           command: ./gradlew ktlintFormat
       - run:
           name: Commit changes
+          shell: bash +e {0}
           command: |
             git config --local user.email "duong.hoang@nokasoft.com"
             git config --local user.name "noka-bot"
