@@ -31,6 +31,7 @@ jobs:
             git config --local user.email "duong.hoang@nokasoft.com"
             git config --local user.name "noka-bot"
             git commit -am "Apply ktlint Format"
+            git push origin HEAD
             exit 0
 
 workflows:
