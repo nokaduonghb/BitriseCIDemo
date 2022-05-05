@@ -27,7 +27,6 @@ jobs:
       - run: '[ ! -z $DANGER_GITHUB_API_TOKEN ] && bundle exec danger || echo "Skipping Danger for External Contributor"'
       - run:
           name: Commit changes
-          shell: bash +e {0}
           command: |
             git config --local user.email "duong.hoang@nokasoft.com"
             git config --local user.name "noka-bot"
