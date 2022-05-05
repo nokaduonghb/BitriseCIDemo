@@ -24,7 +24,6 @@ jobs:
       - run:
           name: Apply ktlint format
           command: ./gradlew ktlintFormat
-      - run: '[ ! -z $DANGER_GITHUB_API_TOKEN ]'
       - run:
           name: Commit changes
           command: |
