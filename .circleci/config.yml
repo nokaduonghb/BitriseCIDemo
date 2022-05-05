@@ -24,12 +24,13 @@ jobs:
       - run:
           name: Apply ktlint format
           command: ./gradlew ktlintFormat
-      - run: '[ ! -z $DANGER_GITHUB_API_TOKEN ] && bundle exec danger || echo "Skipping Danger for External Contributor"'
+      - run: '[ ! -z $DANGER_GITHUB_API_TOKEN ]'
       - run:
           name: Commit changes
           command: |
             git config --local user.email "duong.hoang@nokasoft.com"
             git config --local user.name "noka-bot"
+            git commit -am "Apply ktlint Format"
             exit 0
 
 workflows:
