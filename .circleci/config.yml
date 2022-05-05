@@ -22,9 +22,6 @@ jobs:
             - ~/.gradle
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
-          name: Ktlint check
-          command: ./gradlew ktlintCheck
-      - run:
           name: Apply ktlint format
           command: ./gradlew ktlintMainSourceSetFormat
       - run:
