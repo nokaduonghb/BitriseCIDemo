@@ -30,6 +30,7 @@ jobs:
 
   apply_ktlint:
     <<: *defaults
+    if: ${{ !github.event.pull_request.draft }}
     steps:
       - checkout
       - run:
