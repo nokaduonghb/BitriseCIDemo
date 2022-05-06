@@ -29,9 +29,9 @@ jobs:
             ref: ${{ github.event.pull_request.head.ref }}
           name: Apply ktlint format
           command: ./gradlew ktlintFormat
-      - run: yes || exit 0
+      - run:
           name: Commit changes
-          command: |
+          command: yes || exit 0
             git config --local user.email "duong.hoang@nokasoft.com"
             git config --local user.name "noka-bot"
             git commit -am "Apply ktlint Format"
