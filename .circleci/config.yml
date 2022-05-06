@@ -31,12 +31,11 @@ jobs:
           command: ./gradlew ktlintFormat
       - run:
           name: Commit changes
-          shell: bash +e {0}
           command: |
             git config --local user.email "duong.hoang@nokasoft.com"
             git config --local user.name "noka-bot"
             git commit -am "Apply ktlint Format"
-            git push https://nokaduonghb:${DANGER_GITHUB_API_TOKEN}@github.com/nokaduonghb/BitriseCIDemo.git || true
+            git push https://nokaduonghb:${DANGER_GITHUB_API_TOKEN}@github.com/nokaduonghb/BitriseCIDemo.git || exit 0
             exit 0
       - run:
           name: Check build
