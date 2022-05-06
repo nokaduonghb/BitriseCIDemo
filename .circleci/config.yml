@@ -37,8 +37,9 @@ jobs:
           name: Download Dependencies
           command: sudo chmod +x ./gradlew
       - run:
-          with:
-            ref: ${{ github.event.pull_request.head.ref }}
+          use:
+            with:
+              ref: ${{ github.event.pull_request.head.ref }}
           name: Apply ktlint format
           command: ./gradlew ktlintFormat
       - run:

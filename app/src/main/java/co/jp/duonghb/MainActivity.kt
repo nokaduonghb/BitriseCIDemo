@@ -39,6 +39,6 @@ fun Greeting(name: String) {
 @Composable
 fun DefaultPreview() {
     BitriseCIDemoTheme {
-        Greeting("Android")
+         Greeting("Android")
     }
 }
