@@ -31,8 +31,7 @@ jobs:
   apply_ktlint:
     <<: *defaults
     steps:
-      - attach_workspace:
-          at: ~/code
+      - checkout
       - run:
           name: Download Dependencies
           command: sudo chmod +x ./gradlew
