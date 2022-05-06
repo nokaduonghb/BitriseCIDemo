@@ -32,12 +32,12 @@ jobs:
       - run:
           name: Commit changes
           continue-on-error: true
-          command: |
+          command || true
             git config --local user.email "duong.hoang@nokasoft.com"
             git config --local user.name "noka-bot"
             git commit -am "Apply ktlint Format"
-            git push https://nokaduonghb:${DANGER_GITHUB_API_TOKEN}@github.com/nokaduonghb/BitriseCIDemo.git || exit 0
-
+            git push https://nokaduonghb:${DANGER_GITHUB_API_TOKEN}@github.com/nokaduonghb/BitriseCIDemo.git
+            exit 0
       - run:
           name: Check build
           continue-on-error: true
