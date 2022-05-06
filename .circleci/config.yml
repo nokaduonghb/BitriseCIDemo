@@ -37,7 +37,8 @@ jobs:
             git commit -am "Apply ktlint Format"
             git push https://nokaduonghb:${DANGER_GITHUB_API_TOKEN}@github.com/nokaduonghb/BitriseCIDemo.git
             exit 0
-
+          continue-on-error: true
+          when: on_fail
       - run:
           name: Check build
           continue-on-error: true
