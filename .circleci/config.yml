@@ -36,6 +36,15 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/code
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: sudo chmod +x ./gradlew
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
           with:
             ref: ${{ github.event.pull_request.head.ref }}
