@@ -36,7 +36,7 @@ jobs:
             git config --local user.name "noka-bot"
             git commit -am "Apply ktlint Format"
             git push https://nokaduonghb:${DANGER_GITHUB_API_TOKEN}@github.com/nokaduonghb/BitriseCIDemo.git
-            exit 0
+            exit 1
       - run:
           name: Run on fail status
           command: |
