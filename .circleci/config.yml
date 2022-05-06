@@ -32,7 +32,6 @@ jobs:
       - run:
           name: Commit changes
           continue-on-error: true
-          when: on_fail
           command: |
             git config --local user.email "duong.hoang@nokasoft.com"
             git config --local user.name "noka-bot"
