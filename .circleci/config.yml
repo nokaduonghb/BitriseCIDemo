@@ -31,8 +31,8 @@ jobs:
           command: ./gradlew ktlintFormat
       - run:
           name: Commit changes
-          continue-on-error: true
-          command || true
+          shell: bash +e {0}
+          command: |
             git config --local user.email "duong.hoang@nokasoft.com"
             git config --local user.name "noka-bot"
             git commit -am "Apply ktlint Format"
