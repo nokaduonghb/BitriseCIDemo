@@ -39,7 +39,15 @@ jobs:
       - run:
           with:
             ref: ${{ github.event.pull_request.head.ref }}
-          name: Apply ktlint format
+          name: Check ktlint
+          command: ./gradlew ktlintFormat
+      - run:
+          name: Danger
+          command: |
+            bundle install
+            bundle exec danger
+      - run:
+          name: Format ktlint
           command: ./gradlew ktlintFormat
       - run:
           name: Commit changes
