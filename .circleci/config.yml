@@ -11,7 +11,7 @@ on:
     types: [ opened, reopened, synchronize, ready_for_review ]
 
 jobs:
-  apply_ktlint:
+  build:
     <<: *defaults
     steps:
       - checkout
@@ -24,6 +24,18 @@ jobs:
           paths:
             - ~/.gradle
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Build apk
+          command: ./gradlew :app:assembleDebug
+      - store_artifacts:
+          path: app/build/outputs/apk/app-debug.apk
+          destination: app-debug.apk
+
+  apply_ktlint:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/code
       - run:
           with:
             ref: ${{ github.event.pull_request.head.ref }}
@@ -38,14 +50,12 @@ jobs:
             git commit -am "Apply ktlint Format"
             git push https://nokaduonghb:${DANGER_GITHUB_API_TOKEN}@github.com/nokaduonghb/BitriseCIDemo.git
             exit 0
-      - run:
-          name: Check build
-          continue-on-error: true
-          command: |
-            exit 0
 
 workflows:
   version: 2
   build_and_apply_ktlint:
     jobs:
-      - apply_ktlint
+      - build
+      - apply_ktlint:
+          requires:
+            - build
