@@ -38,6 +38,13 @@ jobs:
             git push https://nokaduonghb:${DANGER_GITHUB_API_TOKEN}@github.com/nokaduonghb/BitriseCIDemo.git
             exit 0
 
+      - run:
+          name: Check build
+          continue-on-error: true
+          when: on_fail
+          command: |
+            exit 0
+
 workflows:
   version: 2
   build_and_apply_ktlint:
