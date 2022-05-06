@@ -6,6 +6,9 @@ defaults: &defaults
     - image: circleci/android:api-29
   environment:
     JVM_OPTS: -Xmx3200m
+on:
+  pull_request:
+    types: [ opened, reopened, synchronize, ready_for_review ]
 
 jobs:
   apply_ktlint:
@@ -26,8 +29,8 @@ jobs:
             ref: ${{ github.event.pull_request.head.ref }}
           name: Apply ktlint format
           command: ./gradlew ktlintFormat
-      - run:
-          name: Commit changes || true
+      - run: yes || exit 0
+          name: Commit changes
           command: |
             git config --local user.email "duong.hoang@nokasoft.com"
             git config --local user.name "noka-bot"
