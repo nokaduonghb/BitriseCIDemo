@@ -32,7 +32,7 @@ jobs:
       - run:
           name: Commit changes
           shell: bash +e {0}
-          command: |
+          command:
             git config --local user.email "duong.hoang@nokasoft.com"
             git config --local user.name "noka-bot"
             git commit -am "Apply ktlint Format"
