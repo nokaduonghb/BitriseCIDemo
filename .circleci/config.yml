@@ -31,13 +31,13 @@ jobs:
           command: ./gradlew ktlintFormat
       - run:
           name: Commit changes
-          continue-on-error: true
           command: |
             git config --local user.email "duong.hoang@nokasoft.com"
             git config --local user.name "noka-bot"
             git commit -m "Apply ktlint Format"
             git push https://nokaduonghb:${DANGER_GITHUB_API_TOKEN}@github.com/nokaduonghb/BitriseCIDemo.git origin
             exit 0
+          continue-on-error: true
 
 workflows:
   version: 2
