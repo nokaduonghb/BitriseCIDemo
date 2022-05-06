@@ -56,9 +56,9 @@ workflows:
   build_and_apply_ktlint:
     jobs:
       - build:
-        filters:
-          branches:
-            ignore: /.*/
+          filters:
+            branches:
+              ignore: /.*/
       - apply_ktlint:
           requires:
             - build
