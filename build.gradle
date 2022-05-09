@@ -17,7 +17,7 @@ allprojects {
 
     ktlint {
         android = true
-        ignoreFailures = true
+        ignoreFailures = false
         additionalEditorconfigFile = file("lint/.editorconfig")
         reporters {
             reporter "checkstyle"
