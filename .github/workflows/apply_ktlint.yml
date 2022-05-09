@@ -41,17 +41,4 @@ jobs:
         env:
           DANGER_GITHUB_API_TOKEN:  ${{ secrets.DANGER_GITHUB_API_TOKEN }}
         run: bundle exec danger
-      - uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.DANGER_GITHUB_API_TOKEN }}
-          ref: ${{ github.event.pull_request.head.ref }}
-      - name: Apply ktlint format
-        run: ./gradlew ktlintFormat
-      - name: Commit changes
-        shell: bash +e {0}
-        run: |
-          git config --local user.email "duong.hoang@nokasoft.com"
-          git config --local user.name "nowvoice-bot"
-          git commit -am "Apply ktlint Format" && git push origin HEAD
-          exit 0
 
