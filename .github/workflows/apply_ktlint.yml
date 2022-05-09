@@ -1,5 +1,4 @@
 # PR がレビュー可能になったら Ktlint を適用する
-# PR がレビュー可能になったら Ktlint を適用する
 name: Ktlint Check & Apply Ktlint format & Commit changes
 
 on:
@@ -36,8 +35,6 @@ jobs:
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: ktlint
-        run: ./gradlew ktlintCheck
       - name: Danger
         env:
           DANGER_GITHUB_API_TOKEN:  ${{ secrets.GITHUB_TOKEN }}
