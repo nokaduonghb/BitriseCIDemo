@@ -19,10 +19,10 @@ class MainActivity : ComponentActivity() {
             BitriseCIDemoTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                     modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                     Greeting("Android")
+                    Greeting("Android")
                 }
             }
             // Test
@@ -39,9 +39,7 @@ fun Greeting(name: String) {
 @Composable
 fun DefaultPreview() {
 
-
-     BitriseCIDemoTheme {
+    BitriseCIDemoTheme {
         Greeting("Android")
     }
-
 }
