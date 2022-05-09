@@ -6,9 +6,6 @@ defaults: &defaults
     - image: circleci/android:api-29
   environment:
     JVM_OPTS: -Xmx3200m
-on:
-  pull_request:
-    types: [ opened, reopened, synchronize, ready_for_review ]
 
 jobs:
   build:
@@ -28,48 +25,8 @@ jobs:
           path: app/build/outputs/apk/app-debug.apk
           destination: app-debug.apk
 
-  apply_ktlint:
-    <<: *defaults
-    if: ${{ !github.event.pull_request.draft }}
-    steps:
-      - checkout
-      - run:
-          name: Download Dependencies
-          command: sudo chmod +x ./gradlew
-      - run:
-          with:
-            ref: ${{ github.event.pull_request.head.ref }}
-          name: Check ktlint
-          command: ./gradlew ktlintFormat
-      - run:
-          name: Danger
-          command: |
-            bundle install
-            bundle exec danger
-      - run:
-          name: Format ktlint
-          command: ./gradlew ktlintFormat
-      - run:
-          name: Commit changes
-          shell: /bin/bash
-          command: |
-            git config --local user.email "duong.hoang@nokasoft.com"
-            git config --local user.name "noka-bot"
-            git commit -am "Apply ktlint Format"
-            git push https://nokaduonghb:${DANGER_GITHUB_API_TOKEN}@github.com/nokaduonghb/BitriseCIDemo.git
-            exit 0
-
 workflows:
   version: 2
-  build_and_apply_ktlint:
+  build:
     jobs:
-      - build:
-          filters:
-            branches:
-              ignore: main
-      - apply_ktlint:
-          requires:
-            - build
-          filters:
-            branches:
-              ignore: main
+      - build
