@@ -41,6 +41,4 @@ fun DefaultPreview() {
     BitriseCIDemoTheme {
         Greeting("Android")
     }
-
-
 }
