@@ -1,8 +1,7 @@
 # ktlint check
 github.dismiss_out_of_range_messages
 checkstyle_format.base_path = Dir.pwd
-Dir["**/build/reports/ktlint/ktlint*.xml"].each do |file|
-  checkstyle_format.report file
+checkstyle_format.report 'app/build/reports/ktlint/ktlintMainSourceSetCheck/ktlintMainSourceSetCheck.xml'
 end
 
 # android lint
