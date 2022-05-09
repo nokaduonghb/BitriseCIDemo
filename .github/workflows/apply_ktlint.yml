@@ -37,7 +37,7 @@ jobs:
           key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - uses: actions/checkout@v2
         with:
-          github_token: ${{ secrets.DANGER_GITHUB_API_TOKEN }}
+          token: ${{ secrets.DANGER_GITHUB_API_TOKEN }}
           ref: ${{ github.event.pull_request.head.ref }}
       - name: Apply ktlint format
         run: ./gradlew ktlintFormat
