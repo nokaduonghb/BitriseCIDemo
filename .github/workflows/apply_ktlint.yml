@@ -35,8 +35,6 @@ jobs:
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: ktlint
-        run: ./gradlew ktlintCheck
       - name: Danger
         env:
           DANGER_GITHUB_API_TOKEN:  ${{ secrets.GITHUB_TOKEN }}
