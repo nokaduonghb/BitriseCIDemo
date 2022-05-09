@@ -1,4 +1,5 @@
 # PR がレビュー可能になったら Ktlint を適用する
+# PR がレビュー可能になったら Ktlint を適用する
 name: Ktlint Check & Apply Ktlint format & Commit changes
 
 on:
