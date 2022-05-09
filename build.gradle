@@ -16,9 +16,12 @@ allprojects {
     // Optionally configure plugin
 
     ktlint {
-        debug = true
         android = true
         ignoreFailures = true
+        additionalEditorconfigFile = file("lint/.editorconfig")
+        reporters {
+            reporter "checkstyle"
+        }
     }
 }
 
